@@ -55,12 +55,13 @@ namespace Morning_Shooter_Game.Controller
         Texture2D projectileTexture;
         List<Projectile> projectiles;
         Texture2D burstTexture;
-       // List<Burst> burst1;
-       // List<Burst> burst2;
-       // List<Burst> burst3;
+        List<Burst> burst1;
+        List<Burst> burst2;
+        List<Burst> burst3;
         // The rate of fire of the player laser
         TimeSpan fireTime;
         TimeSpan previousFireTime;
+
         Texture2D explosionTexture;
         List<Animation> explosions;
         // The sound that is played when a laser is fired
@@ -89,9 +90,9 @@ namespace Morning_Shooter_Game.Controller
         /// </summary>
         protected override void Initialize()
         {
-           // burst1 = new List<Burst>();
-           // burst2 = new List<Burst>();
-           // burst3 = new List<Burst>();
+            burst1 = new List<Burst>();
+            burst2 = new List<Burst>();
+            burst3 = new List<Burst>();
             projectiles = new List<Projectile>();
             explosions = new List<Animation>();
             //Set player's score to zero
@@ -143,7 +144,8 @@ namespace Morning_Shooter_Game.Controller
             bgLayer1.Initialize(Content, "Images/bgLayer1", GraphicsDevice.Viewport.Width, -1);
             bgLayer2.Initialize(Content, "Images/bgLayer2", GraphicsDevice.Viewport.Width, -2);
             enemyTexture = Content.Load<Texture2D>("Images/mineAnimation");
-            projectileTexture = Content.Load<Texture2D>("Images/laser"); 
+            projectileTexture = Content.Load<Texture2D>("Images/laser");
+            burstTexture = Content.Load<Texture2D>("Images/laser");
             explosionTexture = Content.Load<Texture2D>("Images/explosion");
             // Load the music
             gameplayMusic = Content.Load<Song>("sounds/gameMusic");
@@ -202,6 +204,8 @@ namespace Morning_Shooter_Game.Controller
             UpdateCollision();
             // Update the projectiles
             UpdateProjectiles();
+            //Update the Burst
+            UpdateBurst();
             // Update the explosions
             UpdateExplosions(gameTime);
             base.Update(gameTime);
@@ -224,11 +228,46 @@ namespace Morning_Shooter_Game.Controller
                 }
             }
         }
+      
+
         private void AddProjectile(Vector2 position)
         {
             Projectile projectile = new Projectile();
             projectile.Initialize(GraphicsDevice.Viewport, projectileTexture, position);
             projectiles.Add(projectile);
+        }
+       
+       
+        private void UpdateBurst()
+        {
+            // Update the Busrt
+            for (int i = burst1.Count - 1; i >= 0; i--)
+            {
+                burst1[i].Update();
+
+                if (burst1[i].Active == false)
+                {
+                    burst1.RemoveAt(i);
+                }
+            }
+            for (int i = burst2.Count - 1; i >= 0; i--)
+            {
+                burst2[i].Update();
+
+                if (burst2[i].Active == false)
+                {
+                    burst2.RemoveAt(i);
+                }
+            }
+            for (int i = burst3.Count - 1; i >= 0; i--)
+            {
+                burst3[i].Update();
+
+                if (burst3[i].Active == false)
+                {
+                    burst3.RemoveAt(i);
+                }
+            }
         }
         private void UpdateProjectiles()
         {
@@ -243,6 +282,7 @@ namespace Morning_Shooter_Game.Controller
                 }
             }
         }
+      
         private void PlayMusic(Song song)
         {
             // Due to the way the MediaPlayer plays music,
@@ -317,6 +357,90 @@ namespace Morning_Shooter_Game.Controller
                     }
                 }
             }
+            for (int i = 0; i < burst1.Count; i++)
+            {
+                for (int j = 0; j < enemies.Count; j++)
+                {
+                    // Create the rectangles we need to determine if we collided with each other
+                    rectangle1 = new Rectangle((int)burst1[i].Position.X -
+                    burst1[i].Width / 2, (int)burst1[i].Position.Y -
+                    burst1[i].Height / 2, burst1[i].Width, burst1[i].Height);
+
+                    rectangle2 = new Rectangle((int)enemies[j].Position.X - enemies[j].Width / 2,
+                    (int)enemies[j].Position.Y - enemies[j].Height / 2,
+                    enemies[j].Width, enemies[j].Height);
+
+                    // Determine if the two objects collided with each other
+                    if (rectangle1.Intersects(rectangle2))
+                    {
+                        enemies[j].Health -= projectiles[i].Damage;
+                       burst1[i].Active = false;
+                    }
+                }
+            }
+            for (int i = 0; i < burst1.Count; i++)
+            {
+                for (int j = 0; j < enemies.Count; j++)
+                {
+                    // Create the rectangles we need to determine if we collided with each other
+                    rectangle1 = new Rectangle((int)burst1[i].Position.X -
+                    burst1[i].Width / 2, (int)burst1[i].Position.Y -
+                    burst1[i].Height / 2, burst1[i].Width, burst1[i].Height);
+
+                    rectangle2 = new Rectangle((int)enemies[j].Position.X - enemies[j].Width / 2,
+                    (int)enemies[j].Position.Y - enemies[j].Height / 2,
+                    enemies[j].Width, enemies[j].Height);
+
+                    // Determine if the two objects collided with each other
+                    if (rectangle1.Intersects(rectangle2))
+                    {
+                        enemies[j].Health -= projectiles[i].Damage;
+                        burst1[i].Active = false;
+                    }
+                }
+            }
+                for (int i = 0; i < burst2.Count; i++)
+                {
+                    for (int j = 0; j < enemies.Count; j++)
+                    {
+                        // Create the rectangles we need to determine if we collided with each other
+                        rectangle1 = new Rectangle((int)burst1[i].Position.X -
+                        burst2[i].Width / 2, (int)burst2[i].Position.Y -
+                        burst2[i].Height / 2, burst2[i].Width, burst2[i].Height);
+
+                        rectangle2 = new Rectangle((int)enemies[j].Position.X - enemies[j].Width / 2,
+                        (int)enemies[j].Position.Y - enemies[j].Height / 2,
+                        enemies[j].Width, enemies[j].Height);
+
+                        // Determine if the two objects collided with each other
+                        if (rectangle1.Intersects(rectangle2))
+                        {
+                            enemies[j].Health -= projectiles[i].Damage;
+                            burst2[i].Active = false;
+                        }
+                    }
+                }
+                for (int i = 0; i < burst3.Count; i++)
+                {
+                    for (int j = 0; j < enemies.Count; j++)
+                    {
+                        // Create the rectangles we need to determine if we collided with each other
+                        rectangle1 = new Rectangle((int)burst1[i].Position.X -
+                        burst3[i].Width / 2, (int)burst3[i].Position.Y -
+                        burst3[i].Height / 2, burst3[i].Width, burst3[i].Height);
+
+                        rectangle2 = new Rectangle((int)enemies[j].Position.X - enemies[j].Width / 2,
+                        (int)enemies[j].Position.Y - enemies[j].Height / 2,
+                        enemies[j].Width, enemies[j].Height);
+
+                        // Determine if the two objects collided with each other
+                        if (rectangle1.Intersects(rectangle2))
+                        {
+                            enemies[j].Health -= projectiles[i].Damage;
+                            burst3[i].Active = false;
+                        }
+                    }
+                }
         }
 
         private void AddEnemy()
@@ -416,6 +540,21 @@ namespace Morning_Shooter_Game.Controller
                 // Play the laser sound
                 laserSound.Play();
             }
+            if (currentGamePadState.Buttons.A == ButtonState.Pressed || currentKeyboardState.IsKeyDown(Keys.F))
+            {
+                AddProjectile(player.Position + new Vector2(player.Width / 2, 0));
+                laserSound.Play();
+            }
+            if (currentGamePadState.Buttons.A == ButtonState.Pressed || currentKeyboardState.IsKeyDown(Keys.F))
+            {
+                AddProjectile(player.Position + new Vector2(player.Width / 2, 0));
+                laserSound.Play();
+            }
+            if (currentGamePadState.Buttons.A == ButtonState.Pressed || currentKeyboardState.IsKeyDown(Keys.F))
+            {
+                AddProjectile(player.Position + new Vector2(player.Width / 2, 0));
+                laserSound.Play();
+            }
             // reset score if player health goes to zero
             if (player.Health <= 0)
             {
@@ -451,6 +590,18 @@ namespace Morning_Shooter_Game.Controller
             for (int i = 0; i < projectiles.Count; i++)
             {
                 projectiles[i].Draw(spriteBatch);
+            }
+            for (int i = 0; i < burst1.Count; i++)
+            {
+                burst1[i].Draw(spriteBatch);
+            }
+            for (int i = 0; i < burst2.Count; i++)
+            {
+                burst2[i].Draw(spriteBatch);       
+            }
+            for (int i = 0; i < burst3.Count; i++)
+            {
+                burst3[i].Draw(spriteBatch);
             }
             // Draw the Player
             player.Draw(spriteBatch);
